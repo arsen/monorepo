@@ -2,6 +2,17 @@
 
 This Firebase Functions project is part of a pnpm monorepo but uses **npm for deployment** to ensure compatibility with Firebase Cloud Build.
 
+## 📦 Bundled Deployment Strategy
+
+All deployment artifacts are bundled into a **`.deploy/` folder** which is the only directory uploaded to Firebase:
+- ✅ Self-contained deployment bundle
+- ✅ All dependencies (including workspace `.tgz` files) packaged together  
+- ✅ Clean separation between development and deployment
+- ✅ Simplified `.firebaseignore` (only `.deploy/` is deployed)
+- ✅ **Root environment never touched** - no backup/restore needed!
+
+The root `package.json` and `node_modules` remain unchanged during deployment, so your development environment is never affected.
+
 ## Local Development
 
 The backend uses **pnpm** with workspace dependencies during development:
@@ -49,45 +60,48 @@ npm run deploy
 ```
 
 This script automatically:
-1. ✅ **Prepares**: Builds & packs workspace dependencies, installs with npm
-2. ✅ **Deploys**: Uploads to Firebase
-3. ✅ **Restores**: Cleans up and restores pnpm workspace environment
+1. ✅ **Prepares**: Builds & packs workspace dependencies into `.deploy/` folder
+2. ✅ **Deploys**: Uploads only `.deploy/` to Firebase
 
 ### What Happens Behind the Scenes
 
 **During Deployment (`prepare:deploy`)**:
-1. Builds workspace packages (`@everdesk/types`) - compiles TypeScript → JavaScript
-2. Builds the backend functions (outputs to `lib/` directory)
-3. **Packs workspace dependencies** using `npm pack` (creates `.tgz` files)
-4. Updates `package.json` to use `file:` protocol (points to `.tgz` files)
-5. Removes pnpm `node_modules`
-6. Installs dependencies with npm (Firebase compatible)
+1. Cleans up any old `.deploy/` folder
+2. Builds workspace packages (`@everdesk/types`) - compiles TypeScript → JavaScript
+3. Builds the backend functions (outputs to `lib/` directory)
+4. Creates `.deploy/` folder structure
+5. **Packs workspace dependencies** using `npm pack` (creates `.tgz` files)
+6. Copies compiled `lib/` directory into `.deploy/lib/`
+7. Creates modified `package.json` in `.deploy/` with `file:` protocol references
+8. Installs dependencies with npm inside `.deploy/node_modules/`
+9. Copies `package-lock.json` to/from `.deploy/` for reproducibility
 
-**What Gets Deployed**:
-- `lib/` - Compiled JavaScript (from TypeScript build)
-- `.packed-deps/` - **Required!** Packed workspace dependencies (`.tgz` files)
-- `node_modules/` - Pre-installed dependencies (Firebase will also run `npm ci`)
-- `package.json` - Modified to use `file:` references (e.g., `file:.packed-deps/everdesk-types-0.0.0.tgz`)
-- `package-lock.json` - npm lockfile
-- Configuration files (firebase.json, etc.)
+**What Gets Deployed** (everything is bundled in `.deploy/`):
+- `.deploy/lib/` - Compiled JavaScript (from TypeScript build)
+- `.deploy/.packed-deps/` - **Required!** Packed workspace dependencies (`.tgz` files)
+- `.deploy/node_modules/` - Pre-installed dependencies (Firebase will also run `npm ci`)
+- `.deploy/package.json` - Modified to use `file:` references (e.g., `file:.packed-deps/everdesk-types-0.0.0.tgz`)
+- `.deploy/package-lock.json` - npm lockfile for reproducible builds
 
-**Important**: The `.packed-deps/` directory MUST be deployed because:
-- `package.json` references the `.tgz` files inside it
-- Firebase Cloud Build runs `npm ci` which needs to access these files
-- Without it, the build will fail with "ENOENT: no such file or directory"
+**Important**: Everything needed for deployment is self-contained in the `.deploy/` folder:
+- `firebase.json` points to `.deploy` as the functions source
+- `.firebaseignore` ensures only `.deploy/` is uploaded to Firebase
+- All dependencies (including workspace `.tgz` files) are bundled inside
+- Firebase Cloud Build runs `npm ci` inside `.deploy/` which has everything it needs
 
 **What Doesn't Get Deployed** (via `.firebaseignore`):
-- `src/` - Source TypeScript files (not needed, we have compiled JS)
-- `scripts/` - Deployment scripts (not needed in production)
-- `*.backup` - Backup files created during preparation
-- `.git/`, logs, and other dev files
+- Everything at the root level (src/, scripts/, lib/, node_modules/, etc.)
+- Only `.deploy/` folder is deployed
+- `.git/`, logs, and other unnecessary files are excluded
 
-**After Deployment (`postdeploy`)**:
-1. Restores original `package.json` with `workspace:*` dependencies
-2. Reinstalls with pnpm to restore workspace symlinks
-3. Removes `.packed-deps/` directory
-4. **Keeps `package-lock.json`** (it should be committed to git for reproducible builds)
-5. **This is crucial**: ensures changes to `packages/types` are immediately reflected in your backend during development
+**After Deployment**:
+- The `.deploy/` folder remains (it's in `.gitignore`)
+- Your root environment is **completely untouched**:
+  - `package.json` still has `workspace:*` dependencies
+  - `node_modules/` still has pnpm workspace symlinks
+  - No restoration needed!
+- The next `prepare:deploy` will clean up the old `.deploy/` automatically
+- Optionally run `npm run cleanup` to remove `.deploy/` immediately
 
 ## Why This Approach?
 
@@ -101,9 +115,10 @@ This script automatically:
 **Benefits**:
 - ✅ No manual intervention needed
 - ✅ Firebase gets standard npm packages
-- ✅ Development keeps fast workspace updates
-- ✅ Clean separation between dev and deploy
+- ✅ Development keeps fast workspace updates (root environment never touched!)
+- ✅ Clean separation between dev and deploy (everything in `.deploy/`)
 - ✅ Reproducible builds via committed `package-lock.json`
+- ✅ No backup/restore needed - root `package.json` never modified
 
 ## Package Lock Management
 
@@ -213,9 +228,9 @@ When you add a new workspace package:
 # Pack the new package
 cd ../../packages/your-package
 YOUR_PKG_TARBALL=$(npm pack --quiet)
-mv "$YOUR_PKG_TARBALL" ../../apps/backend/.packed-deps/
+mv "$YOUR_PKG_TARBALL" ../../apps/backend/.deploy/.packed-deps/
 cd -
-echo "✅ Packed @everdesk/your-package → .packed-deps/$YOUR_PKG_TARBALL"
+echo "✅ Packed @everdesk/your-package → .deploy/.packed-deps/$YOUR_PKG_TARBALL"
 ```
 
 3. Update the Node.js script in `prepare-deploy.sh` to handle the new package:
@@ -225,6 +240,8 @@ if (pkg.dependencies['@everdesk/your-package']) {
   pkg.dependencies['@everdesk/your-package'] = 'file:.packed-deps/' + yourPkgTgz;
 }
 ```
+
+Note: The path in `package.json` is still `file:.packed-deps/` (relative to `.deploy/` folder)
 
 4. Run `pnpm install` from monorepo root
 
@@ -238,21 +255,22 @@ cd /path/to/monorepo/root
 pnpm install
 ```
 
-### "ENOENT: no such file or directory, open '.packed-deps/...'"
+### "ENOENT: no such file or directory, open '.deploy/...'" or missing .deploy folder
 
-The `.packed-deps` directory was removed. This is normal after `postdeploy`. To rebuild:
+The `.deploy/` folder was removed or doesn't exist yet. To build it:
 ```bash
 npm run prepare:deploy
 ```
 
 ### Changes to workspace packages not reflected in development
 
-If you accidentally have npm `node_modules` instead of pnpm workspace symlinks:
-```bash
-npm run postdeploy
-```
+This should never happen with the new bundled approach since your root environment is never modified! 
 
-This will restore the pnpm environment.
+If you somehow have issues, reinstall with pnpm:
+```bash
+cd /path/to/monorepo/root
+pnpm install
+```
 
 ### Production has different versions than development
 
@@ -283,17 +301,17 @@ If they differ, run `npm run sync-lockfile`.
 npm run prepare:deploy
 ```
 
-**Clean up after deployment** (restore dev environment):
+**Clean up .deploy folder** (optional - auto-cleaned on next prepare):
 ```bash
-npm run postdeploy
+npm run cleanup
 ```
 
 ## Package Manager Status
 
-| Environment | Package Manager | Dependencies Format | Node Modules |
-|-------------|----------------|---------------------|--------------|
-| Development | pnpm | `workspace:*` | Symlinks to `/packages` |
-| Deployment | npm | `file:.packed-deps/*.tgz` | Real directories |
-| Firebase Cloud Build | npm | `file:.packed-deps/*.tgz` | Installed by npm ci |
+| Environment | Package Manager | Dependencies Format | Location | Node Modules |
+|-------------|----------------|---------------------|----------|--------------|
+| Development | pnpm | `workspace:*` | Root | Symlinks to `/packages` |
+| Deployment Prep | npm | `file:.packed-deps/*.tgz` | `.deploy/` | Real directories in `.deploy/node_modules/` |
+| Firebase Cloud Build | npm | `file:.packed-deps/*.tgz` | `.deploy/` (on server) | Installed by npm ci |
 
-The deployment scripts automatically switch between these environments!
+The deployment scripts automatically switch between these environments and bundle everything into `.deploy/` for deployment!

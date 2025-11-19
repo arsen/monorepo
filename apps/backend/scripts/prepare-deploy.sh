@@ -1,8 +1,12 @@
 #!/bin/bash
 # Script to prepare Firebase Functions for deployment
-# Packages workspace dependencies as .tgz files for npm compatibility
+# Bundles everything into .deploy folder with packed workspace dependencies
 
 set -e
+
+echo "🧹 Cleaning up old deployment bundle..."
+rm -rf .deploy
+echo "✅ Removed old .deploy folder"
 
 echo "📦 Building workspace dependencies..."
 cd ../../packages/types && npm run build && cd -
@@ -11,29 +15,35 @@ echo "✅ Built @everdesk/types"
 echo "🔨 Building backend..."
 npm run build
 
-echo "📦 Packing workspace dependencies..."
-# Create a directory for packed dependencies
-mkdir -p .packed-deps
+echo "📁 Creating .deploy folder structure..."
+mkdir -p .deploy/.packed-deps
 
+echo "📦 Packing workspace dependencies..."
 # Pack the types package
 cd ../../packages/types
 TYPES_TARBALL=$(npm pack --quiet)
-mv "$TYPES_TARBALL" ../../apps/backend/.packed-deps/
+mv "$TYPES_TARBALL" ../../apps/backend/.deploy/.packed-deps/
 cd -
-echo "✅ Packed @everdesk/types → .packed-deps/$TYPES_TARBALL"
+echo "✅ Packed @everdesk/types → .deploy/.packed-deps/$TYPES_TARBALL"
 
-echo "📝 Updating package.json with file: references..."
-# Backup original package.json
-cp package.json package.json.backup
+echo "📋 Copying compiled code to .deploy..."
+cp -r lib .deploy/
+echo "✅ Copied lib/ to .deploy/lib/"
 
-# Update package.json to use packed .tgz files
+echo "📝 Creating deployment package.json with exact versions..."
+# Create modified package.json with exact versions from pnpm
 node -e "
 const fs = require('fs');
-const path = require('path');
+const { execSync } = require('child_process');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
+// Get exact versions from pnpm list
+console.log('📋 Reading exact versions from pnpm...');
+const pnpmList = execSync('pnpm list --json --depth=0', { encoding: 'utf8' });
+const installed = JSON.parse(pnpmList)[0];
+
 // Find the packed tarball
-const packedDir = '.packed-deps';
+const packedDir = '.deploy/.packed-deps';
 const files = fs.readdirSync(packedDir);
 const typesTgz = files.find(f => f.startsWith('everdesk-types-'));
 
@@ -41,35 +51,55 @@ if (!typesTgz) {
   throw new Error('Could not find packed types tarball');
 }
 
-// Update dependencies to use file: protocol
-if (pkg.dependencies && pkg.dependencies['@everdesk/types']) {
-  pkg.dependencies['@everdesk/types'] = 'file:.packed-deps/' + typesTgz;
+console.log('📌 Pinning dependencies to exact versions:');
+
+// Update dependencies with exact versions from pnpm
+if (pkg.dependencies) {
+  Object.keys(pkg.dependencies).forEach(name => {
+    if (name.startsWith('@everdesk/')) {
+      // Handle workspace packages with .tgz files
+      if (name === '@everdesk/types') {
+        pkg.dependencies[name] = 'file:.packed-deps/' + typesTgz;
+        console.log('   ' + name + ': file:.packed-deps/' + typesTgz);
+      }
+    } else {
+      // Use exact version from pnpm for external packages
+      if (installed.dependencies && installed.dependencies[name]) {
+        const exactVersion = installed.dependencies[name].version;
+        pkg.dependencies[name] = exactVersion; // Exact version, no ^
+        console.log('   ' + name + ': ' + exactVersion);
+      }
+    }
+  });
 }
 
 // Remove workspace devDependencies for deployment
 if (pkg.devDependencies) {
-  delete pkg.devDependencies['@everdesk/typescript-config'];
+  // Keep only non-workspace devDependencies (though they won't be installed)
+  Object.keys(pkg.devDependencies).forEach(name => {
+    if (name.startsWith('@everdesk/')) {
+      delete pkg.devDependencies[name];
+    }
+  });
 }
 
-fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-console.log('Updated @everdesk/types to:', pkg.dependencies['@everdesk/types']);
+fs.writeFileSync('.deploy/package.json', JSON.stringify(pkg, null, 2));
+console.log('✅ Created .deploy/package.json with exact versions');
 "
-echo "✅ Updated package.json with file: references"
 
-echo "🧹 Cleaning pnpm node_modules..."
-rm -rf node_modules
-echo "✅ Removed pnpm node_modules"
-
-echo "🔧 Installing dependencies with npm..."
-if [ ! -f "package-lock.json" ]; then
-  echo "⚠️  No package-lock.json found - generating one..."
-  echo "⚠️  You should commit this file to git for reproducible builds!"
-  npm install --omit=dev --ignore-scripts
-else
-  echo "📦 Using existing package-lock.json (ensures consistent versions)"
-  npm ci --omit=dev --ignore-scripts
-fi
-echo "✅ Dependencies installed"
+# echo "🔧 Installing dependencies in .deploy folder..."
+# cd .deploy
+# npm install --omit=dev --ignore-scripts
+# echo "✅ Installed production dependencies"
+# cd ..
 
 echo "✨ Deploy preparation complete!"
+echo "📦 Everything bundled in .deploy/ folder:"
+echo "   - .deploy/lib/                (compiled JavaScript)"
+echo "   - .deploy/.packed-deps/       (workspace .tgz files)"
+echo "   - .deploy/node_modules/       (npm dependencies)"
+echo "   - .deploy/package.json        (with exact versions & file: references)"
+echo "   - .deploy/package-lock.json   (for reproducibility)"
+echo "   - .deploy/firebase.json       (Firebase configuration)"
+echo "   - .deploy/*.rules             (Security rules)"
 
