@@ -4,13 +4,30 @@
 
 set -e
 
+# ============================================================================
+# CONFIGURATION: Add workspace dependencies here
+# ============================================================================
+# Format: "package-name:relative-path-from-backend"
+WORKSPACE_DEPS=(
+  "@everdesk/types:../../packages/types"
+  # Add more workspace dependencies here, e.g.:
+  # "@everdesk/ui:../../packages/ui"
+  # "@everdesk/shared:../../packages/shared"
+)
+# ============================================================================
+
 echo "🧹 Cleaning up old deployment bundle..."
 rm -rf .deploy
 echo "✅ Removed old .deploy folder"
 
 echo "📦 Building workspace dependencies..."
-cd ../../packages/types && npm run build && cd -
-echo "✅ Built @everdesk/types"
+for dep in "${WORKSPACE_DEPS[@]}"; do
+  IFS=':' read -r pkg_name pkg_path <<< "$dep"
+  echo "   Building $pkg_name..."
+  cd "$pkg_path" && npm run build && cd - > /dev/null
+  echo "   ✅ Built $pkg_name"
+done
+echo "✅ All workspace dependencies built"
 
 echo "🔨 Building backend..."
 npm run build
@@ -19,12 +36,18 @@ echo "📁 Creating .deploy folder structure..."
 mkdir -p .deploy/.packed-deps
 
 echo "📦 Packing workspace dependencies..."
-# Pack the types package
-cd ../../packages/types
-TYPES_TARBALL=$(npm pack --quiet)
-mv "$TYPES_TARBALL" ../../apps/backend/.deploy/.packed-deps/
-cd -
-echo "✅ Packed @everdesk/types → .deploy/.packed-deps/$TYPES_TARBALL"
+# Store the backend directory path for later use
+BACKEND_DIR="$(pwd)"
+for dep in "${WORKSPACE_DEPS[@]}"; do
+  IFS=':' read -r pkg_name pkg_path <<< "$dep"
+  echo "   Packing $pkg_name..."
+  cd "$pkg_path"
+  TARBALL=$(npm pack --quiet)
+  mv "$TARBALL" "$BACKEND_DIR/.deploy/.packed-deps/"
+  cd - > /dev/null
+  echo "   ✅ Packed $pkg_name → .deploy/.packed-deps/$TARBALL"
+done
+echo "✅ All workspace dependencies packed"
 
 echo "📋 Copying compiled code to .deploy..."
 cp -r lib .deploy/
@@ -42,15 +65,28 @@ console.log('📋 Reading exact versions from pnpm...');
 const pnpmList = execSync('pnpm list --json --depth=0', { encoding: 'utf8' });
 const installed = JSON.parse(pnpmList)[0];
 
-// Find the packed tarball
+// Build a map of workspace package names to their tarball files
 const packedDir = '.deploy/.packed-deps';
 const files = fs.readdirSync(packedDir);
-const typesTgz = files.find(f => f.startsWith('everdesk-types-'));
+const workspacePackageMap = {};
 
-if (!typesTgz) {
-  throw new Error('Could not find packed types tarball');
-}
+// Map tarball files to package names
+// Tarball naming convention: scope-package-version.tgz (e.g., everdesk-types-1.0.0.tgz)
+files.forEach(file => {
+  if (file.endsWith('.tgz')) {
+    // Extract package info from tarball filename
+    // For @everdesk/types -> everdesk-types-x.y.z.tgz
+    const match = file.match(/^(.+?)-(\d+\.\d+\.\d+.*?)\.tgz$/);
+    if (match) {
+      const [, nameSlug] = match;
+      // Convert everdesk-types to @everdesk/types
+      const scopedName = '@' + nameSlug.replace('-', '/');
+      workspacePackageMap[scopedName] = file;
+    }
+  }
+});
 
+console.log('📦 Found workspace packages:', Object.keys(workspacePackageMap).join(', '));
 console.log('📌 Pinning dependencies to exact versions:');
 
 // Update dependencies with exact versions from pnpm
@@ -58,9 +94,11 @@ if (pkg.dependencies) {
   Object.keys(pkg.dependencies).forEach(name => {
     if (name.startsWith('@everdesk/')) {
       // Handle workspace packages with .tgz files
-      if (name === '@everdesk/types') {
-        pkg.dependencies[name] = 'file:.packed-deps/' + typesTgz;
-        console.log('   ' + name + ': file:.packed-deps/' + typesTgz);
+      if (workspacePackageMap[name]) {
+        pkg.dependencies[name] = 'file:.packed-deps/' + workspacePackageMap[name];
+        console.log('   ' + name + ': file:.packed-deps/' + workspacePackageMap[name]);
+      } else {
+        console.warn('⚠️  Warning: ' + name + ' not found in packed dependencies');
       }
     } else {
       // Use exact version from pnpm for external packages
@@ -95,11 +133,3 @@ console.log('✅ Created .deploy/package.json with exact versions');
 
 echo "✨ Deploy preparation complete!"
 echo "📦 Everything bundled in .deploy/ folder:"
-echo "   - .deploy/lib/                (compiled JavaScript)"
-echo "   - .deploy/.packed-deps/       (workspace .tgz files)"
-echo "   - .deploy/node_modules/       (npm dependencies)"
-echo "   - .deploy/package.json        (with exact versions & file: references)"
-echo "   - .deploy/package-lock.json   (for reproducibility)"
-echo "   - .deploy/firebase.json       (Firebase configuration)"
-echo "   - .deploy/*.rules             (Security rules)"
-
