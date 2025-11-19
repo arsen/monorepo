@@ -1,15 +1,15 @@
 {
   "extends": "@everdesk/typescript-config/base.json",
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "ESNext",
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
+    "target": "es2022",
     "rootDir": "src"
   },
   "compileOnSave": true,

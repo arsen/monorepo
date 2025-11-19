@@ -1,9 +1,14 @@
-const typescriptEslint = require("@typescript-eslint/eslint-plugin");
-const typescriptParser = require("@typescript-eslint/parser");
-const importPlugin = require("eslint-plugin-import");
-const googleConfig = require("eslint-config-google");
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import typescriptParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import";
+import googleConfig from "eslint-config-google";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-module.exports = [
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default [
   {
     ignores: ["lib/**/*", ".deploy/**/*", "node_modules/**/*", "eslint.config.js"],
   },

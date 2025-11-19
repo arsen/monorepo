@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "type": "module",
   "scripts": {
     "lint": "eslint .",
     "build": "tsc",
@@ -18,7 +19,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@everdesk/types": "workspace:*",
+    "@everdesk/types": "file:.packed-deps/everdesk-types-0.0.0.tgz",
     "firebase-admin": "13.6.0",
     "firebase-functions": "7.0.0"
   },
