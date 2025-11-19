@@ -9,8 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@everdesk/types": "workspace:*",
-    "@everdesk/ui": "workspace:*",
+    "@monorepo/types": "workspace:*",
+    "@monorepo/ui": "workspace:*",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0"

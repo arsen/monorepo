@@ -1,11 +1,11 @@
 {
-  "extends": "@everdesk/typescript-config/vite-react.json",
+  "extends": "@monorepo/typescript-config/vite-react.json",
   "compilerOptions": {
     /* Paths */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@everdesk/ui/*": ["../../packages/ui/src/*"]
+      "@monorepo/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src"]

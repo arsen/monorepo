@@ -1,5 +1,5 @@
 {
-  "name": "@everdesk/eslint-config",
+  "name": "@monorepo/eslint-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,

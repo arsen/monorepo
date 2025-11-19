@@ -1,6 +1,6 @@
-# @everdesk/types
+# @monorepo/types
 
-Shared types and Zod schemas for the Everdesk monorepo.
+Shared types and Zod schemas for the monorepo.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Install the package in your app:
 ```json
 {
   "dependencies": {
-    "@everdesk/types": "workspace:*"
+    "@monorepo/types": "workspace:*"
   }
 }
 ```
@@ -20,38 +20,32 @@ Import schemas and types in your apps:
 
 ```typescript
 // Import Zod schemas
-import { exampleSchema } from "@everdesk/types/schemas";
+import { exampleSchema } from "@monorepo/types/schemas";
 
 // Import TypeScript types
-import type { ExampleType, Status } from "@everdesk/types/types";
+import type { ExampleType, Status } from "@monorepo/types/types";
 
 // Or import everything
-import { exampleSchema, type ExampleType } from "@everdesk/types/index";
+import { exampleSchema, type ExampleType } from "@monorepo/types/index";
 ```
-
-## Structure
-
-- `src/schemas/` - Zod validation schemas
-- `src/types/` - TypeScript types and interfaces
 
 ## Adding New Types
 
-1. Create a new file in `src/schemas/` for Zod schemas
-2. Create a new file in `src/types/` for TypeScript types
-3. Export them from the respective `index.ts` files
+1. Create a new file in `src/` for Zod schemas/types
+2. Export them from the `index.ts` file
 
 ## Example
 
 ```typescript
-// src/schemas/user.schema.ts
+// src/user.ts
 import { z } from "zod";
 
-export const userSchema = z.object({
+export const User = z.object({
   id: z.string(),
   email: z.string().email(),
-  name: z.string(),
+  name: z.string().optional(),
 });
 
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof User>;
 ```
 

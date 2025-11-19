@@ -1,7 +1,7 @@
-import { Button } from '@everdesk/ui/components/button'
+import { Button } from '@monorepo/ui/components/button'
 import './App.css'
 import { useState } from 'react'
-import { Example } from '@everdesk/types'
+import { Example } from '@monorepo/types'
 
 function App() {
   const [ count, setCount ] = useState(0)

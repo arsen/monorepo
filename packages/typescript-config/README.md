@@ -1,4 +1,4 @@
-# `@everdesk/typescript-config`
+# `@monorepo/typescript-config`
 
 Shared typescript configuration for the workspace.
 
@@ -6,15 +6,15 @@ Shared typescript configuration for the workspace.
 
 ### For Vite React Apps
 
-- `@everdesk/typescript-config/vite-react.json` - Main app TypeScript configuration
-- `@everdesk/typescript-config/vite-node.json` - Node environment configuration (for vite.config.ts)
+- `@monorepo/typescript-config/vite-react.json` - Main app TypeScript configuration
+- `@monorepo/typescript-config/vite-node.json` - Node environment configuration (for vite.config.ts)
 
 ### Usage in a Vite React App
 
 **tsconfig.app.json:**
 ```json
 {
-  "extends": "@everdesk/typescript-config/vite-react.json",
+  "extends": "@monorepo/typescript-config/vite-react.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -28,21 +28,21 @@ Shared typescript configuration for the workspace.
 **tsconfig.node.json:**
 ```json
 {
-  "extends": "@everdesk/typescript-config/vite-node.json",
+  "extends": "@monorepo/typescript-config/vite-node.json",
   "include": ["vite.config.ts"]
 }
 ```
 
 ### For Next.js Apps
 
-- `@everdesk/typescript-config/nextjs.json` - Next.js TypeScript configuration
+- `@monorepo/typescript-config/nextjs.json` - Next.js TypeScript configuration
 
 ### Usage in a Next.js App
 
 **tsconfig.json:**
 ```json
 {
-  "extends": "@everdesk/typescript-config/nextjs.json",
+  "extends": "@monorepo/typescript-config/nextjs.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

@@ -1,9 +1,9 @@
 {
-  "extends": "@everdesk/typescript-config/react-library.json",
+  "extends": "@monorepo/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@everdesk/ui/*": ["./src/*"]
+      "@monorepo/ui/*": ["./src/*"]
     }
   },
   "include": ["."],

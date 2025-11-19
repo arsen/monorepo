@@ -9,10 +9,10 @@ set -e
 # ============================================================================
 # Format: "package-name:relative-path-from-backend"
 WORKSPACE_DEPS=(
-  "@everdesk/types:../../packages/types"
+  "@monorepo/types:../../packages/types"
   # Add more workspace dependencies here, e.g.:
-  # "@everdesk/ui:../../packages/ui"
-  # "@everdesk/shared:../../packages/shared"
+  # "@monorepo/ui:../../packages/ui"
+  # "@monorepo/shared:../../packages/shared"
 )
 # ============================================================================
 
@@ -70,15 +70,15 @@ const files = fs.readdirSync(packedDir);
 const workspacePackageMap = {};
 
 // Map tarball files to package names
-// Tarball naming convention: scope-package-version.tgz (e.g., everdesk-types-1.0.0.tgz)
+// Tarball naming convention: scope-package-version.tgz (e.g., monorepo-types-1.0.0.tgz)
 files.forEach(file => {
   if (file.endsWith('.tgz')) {
     // Extract package info from tarball filename
-    // For @everdesk/types -> everdesk-types-x.y.z.tgz
+    // For @monorepo/types -> monorepo-types-x.y.z.tgz
     const match = file.match(/^(.+?)-(\d+\.\d+\.\d+.*?)\.tgz$/);
     if (match) {
       const [, nameSlug] = match;
-      // Convert everdesk-types to @everdesk/types
+      // Convert monorepo-types to @monorepo/types
       const scopedName = '@' + nameSlug.replace('-', '/');
       workspacePackageMap[scopedName] = file;
     }
@@ -91,7 +91,7 @@ console.log('📌 Pinning dependencies to exact versions:');
 // Update dependencies with exact versions from pnpm
 if (pkg.dependencies) {
   Object.keys(pkg.dependencies).forEach(name => {
-    if (name.startsWith('@everdesk/')) {
+    if (name.startsWith('@monorepo/')) {
       // Handle workspace packages with .tgz files
       if (workspacePackageMap[name]) {
         pkg.dependencies[name] = 'file:.packed-deps/' + workspacePackageMap[name];
@@ -114,7 +114,7 @@ if (pkg.dependencies) {
 if (pkg.devDependencies) {
   // Keep only non-workspace devDependencies (though they won't be installed)
   Object.keys(pkg.devDependencies).forEach(name => {
-    if (name.startsWith('@everdesk/')) {
+    if (name.startsWith('@monorepo/')) {
       delete pkg.devDependencies[name];
     }
   });

@@ -1,5 +1,5 @@
-import { Example } from "@everdesk/types";
-import { Button } from "@everdesk/ui/components/button";
+import { Example } from "@monorepo/types";
+import { Button } from "@monorepo/ui/components/button";
 
 export default function Home() { 
   const example = Example.parse({

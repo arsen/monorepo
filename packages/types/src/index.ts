@@ -1,6 +1,6 @@
 /**
- * @everdesk/types
- * Shared types and Zod schemas for the Everdesk monorepo
+ * @monorepo/types
+ * Shared types and Zod schemas for the  monorepo
  */
 
 export * from "./example.js";

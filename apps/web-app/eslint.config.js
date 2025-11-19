@@ -1,3 +1,3 @@
-import { config } from '@everdesk/eslint-config/vite-react'
+import { config } from '@monorepo/eslint-config/vite-react'
 
 export default config

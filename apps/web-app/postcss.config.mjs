@@ -1,1 +1,1 @@
-export { default } from "@everdesk/ui/postcss.config";
+export { default } from "@monorepo/ui/postcss.config";

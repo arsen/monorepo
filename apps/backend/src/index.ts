@@ -12,7 +12,7 @@ import { onRequest } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 
 // Import shared types from the monorepo
-import { Example } from "@everdesk/types";
+import { Example } from "@monorepo/types";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript

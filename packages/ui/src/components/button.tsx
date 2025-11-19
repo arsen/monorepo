@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@everdesk/ui/lib/utils";
+import { cn } from "@monorepo/ui/lib/utils";
 import { forwardRef, useLayoutEffect, useRef, useCallback, useState } from "react";
 
 const buttonVariants = cva(

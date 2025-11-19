@@ -1,5 +1,5 @@
 {
-  "extends": "@everdesk/typescript-config/base.json",
+  "extends": "@monorepo/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "module": "NodeNext",
@@ -9,7 +9,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@everdesk/types/*": ["./src/*"]
+      "@monorepo/types/*": ["./src/*"]
     }
   },
   "include": ["src"],

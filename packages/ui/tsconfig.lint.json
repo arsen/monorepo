@@ -1,5 +1,5 @@
 {
-  "extends": "@everdesk/typescript-config/react-library.json",
+  "extends": "@monorepo/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist"
   },

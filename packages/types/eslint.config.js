@@ -1,4 +1,4 @@
-import { config } from "@everdesk/eslint-config/base";
+import { config } from "@monorepo/eslint-config/base";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [...config];

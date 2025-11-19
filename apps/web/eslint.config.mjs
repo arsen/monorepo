@@ -1,3 +1,3 @@
-import { config } from "@everdesk/eslint-config/nextjs";
+import { config } from "@monorepo/eslint-config/nextjs";
 
 export default config;

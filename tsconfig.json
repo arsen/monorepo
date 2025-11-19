@@ -1,4 +1,4 @@
 {
-  "extends": "@everdesk/typescript-config/base.json"
+  "extends": "@monorepo/typescript-config/base.json"
 }
 

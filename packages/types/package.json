@@ -1,5 +1,5 @@
 {
-  "name": "@everdesk/types",
+  "name": "@monorepo/types",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@everdesk/eslint-config": "workspace:*",
-    "@everdesk/typescript-config": "workspace:*",
+    "@monorepo/eslint-config": "workspace:*",
+    "@monorepo/typescript-config": "workspace:*",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "typescript": "^5.9.3"

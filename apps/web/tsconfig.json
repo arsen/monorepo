@@ -1,10 +1,10 @@
 {
-  "extends": "@everdesk/typescript-config/nextjs.json",
+  "extends": "@monorepo/typescript-config/nextjs.json",
   "compilerOptions": {
     "jsx": "preserve",
     "paths": {
       "@/*": ["./src/*"],
-      "@everdesk/ui/*": ["../../packages/ui/src/*"]
+      "@monorepo/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [

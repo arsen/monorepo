@@ -1,5 +1,5 @@
 {
-  "name": "everdesk",
+  "name": "monorepo",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@everdesk/eslint-config": "workspace:*",
-    "@everdesk/typescript-config": "workspace:*",
+    "@monorepo/eslint-config": "workspace:*",
+    "@monorepo/typescript-config": "workspace:*",
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",
     "typescript": "5.9.3"
