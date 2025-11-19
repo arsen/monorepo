@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@everdesk/ui/lib/utils";
-import { forwardRef, useLayoutEffect, useRef, useCallback } from "react";
+import { forwardRef, useLayoutEffect, useRef, useCallback, useState } from "react";
 
 const buttonVariants = cva(
   "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
@@ -74,18 +74,18 @@ const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
   ({ children, loading, disabled, ...props }, ref) => {
 
     const buttonRef = useRef<HTMLButtonElement>(null);
-    const preservedSize = useRef<{ width: number; height: number } | null>(null);
+    const [preservedSize, setPreservedSize] = useState<{ width: number; height: number } | null>(null);
 
     useLayoutEffect(() => {
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
-        preservedSize.current = { width: rect.width, height: rect.height };
+        setPreservedSize({ width: rect.width, height: rect.height });
       }
     }, []);
 
-    const buttonStyle = preservedSize.current ? {
-      minWidth: `${preservedSize.current.width}px`,
-      minHeight: `${preservedSize.current.height}px`,
+    const buttonStyle = preservedSize ? {
+      minWidth: `${preservedSize.width}px`,
+      minHeight: `${preservedSize.height}px`,
     } : {};
 
     // Merge the forwarded ref with the internal ref using useCallback
