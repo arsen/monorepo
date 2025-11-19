@@ -11,6 +11,9 @@ import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 
+// Import shared types from the monorepo
+import {Example} from "@everdesk/types";
+
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
@@ -28,5 +31,17 @@ setGlobalOptions({ maxInstances: 10 });
 
 export const helloWorld = onRequest((request, response) => {
   logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Firebase!");
+  
+  // Example of using shared types
+  const exampleData: Example = {
+    id: "123",
+    name: "Test",
+    createdAt: new Date(),
+  };
+  
+  // Validate with Zod schema
+  const validated = Example.parse(exampleData);
+  logger.info("Validated data:", {validated});
+  
+  response.send(validated);
 });
