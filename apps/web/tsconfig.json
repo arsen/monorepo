@@ -3,7 +3,8 @@
   "compilerOptions": {
     "jsx": "preserve",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@everdesk/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [
