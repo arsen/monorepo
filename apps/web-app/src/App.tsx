@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [count1, setCount1] = useState(0)
 
   return (
     <div className="h-full flex flex-col items-center justify-center gap-4">
