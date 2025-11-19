@@ -86,7 +86,7 @@ This script automatically:
 1. Restores original `package.json` with `workspace:*` dependencies
 2. Reinstalls with pnpm to restore workspace symlinks
 3. Removes `.packed-deps/` directory
-4. Removes `package-lock.json`
+4. **Keeps `package-lock.json`** (it should be committed to git for reproducible builds)
 5. **This is crucial**: ensures changes to `packages/types` are immediately reflected in your backend during development
 
 ## Why This Approach?
@@ -103,6 +103,48 @@ This script automatically:
 - ✅ Firebase gets standard npm packages
 - ✅ Development keeps fast workspace updates
 - ✅ Clean separation between dev and deploy
+- ✅ Reproducible builds via committed `package-lock.json`
+
+## Package Lock Management
+
+### Why Commit `package-lock.json`?
+
+**Without a lockfile** (dangerous ❌):
+- `firebase-admin: ^12.6.0` could install `12.6.0`, `12.7.0`, or `12.8.0`
+- Different deployments might get different versions
+- Builds are **not reproducible**
+- A working deploy today might break tomorrow
+
+**With a committed lockfile** (safe ✅):
+- Exact same versions installed every time
+- Reproducible builds
+- Predictable behavior
+
+### How It Works
+
+1. **First time**: `prepare:deploy` generates `package-lock.json` → **commit this to git**
+2. **Subsequent times**: `prepare:deploy` uses existing lockfile with `npm ci`
+3. **Updates**: Only regenerate when you add/update dependencies in `package.json`
+
+```bash
+# After first prepare:deploy
+git add package-lock.json
+git commit -m "Add package-lock.json for reproducible Firebase builds"
+```
+
+### When to Regenerate
+
+Regenerate `package-lock.json` when:
+- You update `firebase-admin`, `firebase-functions`, or other dependencies
+- You add new workspace packages
+
+```bash
+# Force regeneration
+rm package-lock.json
+npm run prepare:deploy
+git add package-lock.json
+git commit -m "Update package-lock.json"
+```
 
 ## Adding More Workspace Dependencies
 

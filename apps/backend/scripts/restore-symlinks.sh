@@ -11,14 +11,8 @@ if [ -f "package.json.backup" ]; then
   echo "✅ Restored original package.json"
 fi
 
-# Restore package-lock.json if it existed
-if [ -f "package-lock.json.backup" ]; then
-  mv package-lock.json.backup package-lock.json
-  echo "✅ Restored package-lock.json"
-elif [ -f "package-lock.json" ]; then
-  rm package-lock.json
-  echo "✅ Removed package-lock.json"
-fi
+# Keep package-lock.json (it should be committed to git for reproducible builds)
+# We don't remove it because Firebase needs it for consistent dependency versions
 
 # Reinstall with pnpm from monorepo root to restore workspace links
 echo "📦 Reinstalling with pnpm..."

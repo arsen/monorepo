@@ -23,11 +23,8 @@ cd -
 echo "✅ Packed @everdesk/types → .packed-deps/$TYPES_TARBALL"
 
 echo "📝 Updating package.json with file: references..."
-# Backup original package.json and package-lock
+# Backup original package.json
 cp package.json package.json.backup
-if [ -f "package-lock.json" ]; then
-  cp package-lock.json package-lock.json.backup
-fi
 
 # Update package.json to use packed .tgz files
 node -e "
@@ -64,7 +61,14 @@ rm -rf node_modules
 echo "✅ Removed pnpm node_modules"
 
 echo "🔧 Installing dependencies with npm..."
-npm install --omit=dev --ignore-scripts
+if [ ! -f "package-lock.json" ]; then
+  echo "⚠️  No package-lock.json found - generating one..."
+  echo "⚠️  You should commit this file to git for reproducible builds!"
+  npm install --omit=dev --ignore-scripts
+else
+  echo "📦 Using existing package-lock.json (ensures consistent versions)"
+  npm ci --omit=dev --ignore-scripts
+fi
 echo "✅ Dependencies installed"
 
 echo "✨ Deploy preparation complete!"

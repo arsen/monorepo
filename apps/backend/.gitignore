@@ -47,6 +47,10 @@ build/Release
 # Dependency directories
 node_modules/
 
+# We use pnpm in development, but keep package-lock.json for Firebase deployment
+# package-lock.json is generated during prepare:deploy and committed for reproducible builds
+# Do NOT ignore it!
+
 # Optional npm cache directory
 .npm
 
