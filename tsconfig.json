@@ -1,0 +1,4 @@
+{
+  "extends": "@everdesk/typescript-config/base.json"
+}
+
