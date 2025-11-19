@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "scripts": {
-    "install": "pnpm install",
     "lint": "eslint .",
     "build": "tsc",
     "build:watch": "tsc --watch",

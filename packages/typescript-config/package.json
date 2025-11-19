@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "license": "PROPRIETARY",
-  "scripts": {
-    "install": "pnpm install"
-  },
   "publishConfig": {
     "access": "public"
   }
