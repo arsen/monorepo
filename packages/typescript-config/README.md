@@ -33,8 +33,32 @@ Shared typescript configuration for the workspace.
 }
 ```
 
+### For Next.js Apps
+
+- `@everdesk/typescript-config/nextjs.json` - Next.js TypeScript configuration
+
+### Usage in a Next.js App
+
+**tsconfig.json:**
+```json
+{
+  "extends": "@everdesk/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
+```
+
 ### Other Configs
 
 - `base.json` - Base configuration
-- `nextjs.json` - Next.js configuration
 - `react-library.json` - React library configuration

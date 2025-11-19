@@ -17,8 +17,20 @@ import { config } from '@everdesk/eslint-config/vite-react'
 export default config
 ```
 
+### For Next.js Apps
+
+- `@everdesk/eslint-config/nextjs` - ESLint configuration for Next.js apps
+
+### Usage in a Next.js App
+
+**eslint.config.mjs:**
+```javascript
+import { config } from '@everdesk/eslint-config/nextjs'
+
+export default config
+```
+
 ### Other Configs
 
 - `base` - Base ESLint configuration
-- `next-js` - Next.js configuration
 - `react-internal` - React internal configuration
