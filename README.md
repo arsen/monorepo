@@ -495,7 +495,7 @@ pnpm --filter backend test
 
 ## 📄 License
 
-Private and proprietary.
+Open Source
 
 ## 🔗 Useful Links
 
