@@ -1,11 +1,16 @@
 import { Button } from '@everdesk/ui/components/button'
 import './App.css'
 import { useState } from 'react'
+import { Example } from '@everdesk/types'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [count1, setCount1] = useState(0)
-
+  const [ count, setCount ] = useState(0)
+  const example = Example.parse({
+    id: "1",
+    name: "Example",
+    createdAt: new Date(),
+  });
+  console.log(example);
   return (
     <div className="h-full flex flex-col items-center justify-center gap-4">
       <h1>Client App</h1>
