@@ -29,16 +29,6 @@ dist
 
 # TypeScript
 *.tsbuildinfo
-# Ignore generated files in apps (libraries need declaration files)
-apps/**/*.d.ts
-apps/**/*.d.ts.map
-apps/**/*.js
-!apps/**/*.env.d.ts
-!apps/**/next-env.d.ts
-!apps/**/vite-env.d.ts
-!apps/**/*.config.js
-!apps/**/eslint.config.js
-
 
 # Debug
 npm-debug.log*
