@@ -24,7 +24,7 @@ importers:
         specifier: 5.7.3
         version: 5.7.3
 
-  apps/client-app:
+  apps/web-app:
     dependencies:
       '@everdesk/ui':
         specifier: workspace:*
