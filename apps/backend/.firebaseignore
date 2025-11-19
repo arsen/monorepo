@@ -1,0 +1,30 @@
+# Don't deploy source files
+src/
+*.ts
+tsconfig*.json
+
+# Don't deploy dev scripts
+scripts/
+
+# Don't deploy backup files
+*.backup
+
+# Node modules (except workspace packages)
+node_modules/
+!node_modules/@everdesk/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Firebase
+.firebase/
+firebase-debug*.log
+
+# Misc
+.DS_Store
+*.local
+

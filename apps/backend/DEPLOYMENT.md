@@ -55,13 +55,29 @@ This script automatically:
 
 **During Deployment (`prepare:deploy`)**:
 1. Builds workspace packages (`@everdesk/types`) to compile TypeScript → JavaScript
-2. Builds the backend functions
+2. Builds the backend functions (outputs to `lib/` directory)
 3. Converts symlinks to real directories (Firebase can't upload symlinks)
 4. Copies compiled packages from `packages/types` → `node_modules/@everdesk/types`
+5. **Modifies `package.json`** - Removes `workspace:*` dependencies (Firebase uses npm, which doesn't understand pnpm workspace protocol)
+
+**What Gets Deployed**:
+- `lib/` - Compiled JavaScript (from TypeScript build)
+- `node_modules/@everdesk/` - Workspace packages (hard copies)
+- `package.json` - Modified to remove workspace dependencies
+- Configuration files (firebase.json, etc.)
+
+**What Doesn't Get Deployed** (via `.firebaseignore`):
+- `src/` - Source TypeScript files (not needed, we have compiled JS)
+- `scripts/` - Deployment scripts (not needed in production)
+- `*.backup` - Backup files created during preparation
+- Most of `node_modules/` (except workspace packages)
+- `.git/`, logs, and other dev files
 
 **After Deployment (`restore:symlinks`)**:
 - Removes hard copies of workspace packages
+- **Restores original `package.json`** with workspace dependencies
 - Runs `pnpm install` to restore symlinks
+- Cleans up temporary files (`package.json.backup`)
 - **This is crucial**: ensures changes to `packages/types` are immediately reflected in your backend during development
 
 **Why this matters?** 
@@ -73,6 +89,11 @@ This script automatically:
 - `@everdesk/types` compiles to CommonJS (using `NodeNext`)
 - Backend uses CommonJS (Firebase Functions standard)
 - No experimental warnings or compatibility issues ✅
+
+**Package Manager Compatibility**:
+- Development uses pnpm with `workspace:*` protocol ✅
+- Deployment creates npm-compatible `package.json` (removes workspace refs) ✅
+- Firebase Cloud Build uses npm and installs only production dependencies ✅
 
 ## Adding More Workspace Dependencies
 

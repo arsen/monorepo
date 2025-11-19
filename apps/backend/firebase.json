@@ -9,17 +9,7 @@
     {
       "source": "./",
       "codebase": "default",
-      "disallowLegacyRuntimeConfig": true,
-      "ignore": [
-        "node_modules",
-        "!node_modules/@everdesk",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local",
-        "src",
-        "scripts"
-      ]
+      "disallowLegacyRuntimeConfig": true
     }
   ],
   "storage": {

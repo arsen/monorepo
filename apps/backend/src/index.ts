@@ -29,7 +29,7 @@ import {Example} from "@everdesk/types";
 // this will be the maximum concurrent request count.
 setGlobalOptions({ maxInstances: 10 });
 
-export const helloWorld = onRequest((request, response) => {
+export const hello = onRequest((request, response) => {
   logger.info("Hello logs!", {structuredData: true});
   
   // Example of using shared types

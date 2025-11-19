@@ -12,6 +12,12 @@ if [ -d "node_modules/@everdesk/types" ] && [ ! -L "node_modules/@everdesk/types
   echo "✅ Removed hard copy of @everdesk/types"
 fi
 
+# Restore original package.json if backup exists
+if [ -f "package.json.backup" ]; then
+  mv package.json.backup package.json
+  echo "✅ Restored original package.json"
+fi
+
 # Restore symlinks by reinstalling from monorepo root
 echo "📦 Reinstalling to restore symlinks..."
 cd ../../ && pnpm install --prefer-offline && cd -
