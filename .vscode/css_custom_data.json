@@ -1,0 +1,30 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@import",
+      "description": "Import Tailwind CSS or other stylesheets"
+    },
+    {
+      "name": "@source",
+      "description": "Tailwind CSS v4: Specify source paths for content scanning"
+    },
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS v4: Define theme configuration inline"
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Tailwind CSS v4: Define custom variants"
+    },
+    {
+      "name": "@layer",
+      "description": "Tailwind CSS: Define styles in base, components, or utilities layers"
+    },
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS: Apply utility classes inline"
+    }
+  ]
+}
+
