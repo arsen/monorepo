@@ -68,5 +68,11 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 
-
+# Compiled output
 lib/
+
+# Packed dependencies for deployment
+.packed-deps/
+
+# Backup files
+*.backup

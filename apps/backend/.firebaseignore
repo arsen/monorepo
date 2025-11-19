@@ -9,10 +9,6 @@ scripts/
 # Don't deploy backup files
 *.backup
 
-# Node modules (except workspace packages)
-node_modules/
-!node_modules/@everdesk/
-
 # Git
 .git/
 .gitignore

@@ -1,26 +1,40 @@
 #!/bin/bash
-# Script to restore workspace symlinks after deployment
-# This ensures development workflow continues to work with live updates
+# Script to clean up after deployment and restore development environment
 
 set -e
 
-echo "🔗 Restoring workspace symlinks..."
+echo "🧹 Cleaning up deployment artifacts..."
 
-# Remove the hard copy of types package
-if [ -d "node_modules/@everdesk/types" ] && [ ! -L "node_modules/@everdesk/types" ]; then
-  rm -rf node_modules/@everdesk/types
-  echo "✅ Removed hard copy of @everdesk/types"
-fi
-
-# Restore original package.json if backup exists
+# Restore original package.json FIRST (before removing .packed-deps)
 if [ -f "package.json.backup" ]; then
   mv package.json.backup package.json
   echo "✅ Restored original package.json"
 fi
 
-# Restore symlinks by reinstalling from monorepo root
-echo "📦 Reinstalling to restore symlinks..."
+# Restore package-lock.json if it existed
+if [ -f "package-lock.json.backup" ]; then
+  mv package-lock.json.backup package-lock.json
+  echo "✅ Restored package-lock.json"
+elif [ -f "package-lock.json" ]; then
+  rm package-lock.json
+  echo "✅ Removed package-lock.json"
+fi
+
+# Reinstall with pnpm from monorepo root to restore workspace links
+echo "📦 Reinstalling with pnpm..."
 cd ../../ && pnpm install --prefer-offline && cd -
 
-echo "✨ Symlinks restored! Development mode ready."
+# NOW remove npm node_modules (after pnpm install succeeded)
+if [ -d "node_modules" ]; then
+  # Keep the pnpm structure, just ensure it's clean
+  echo "✅ Node modules reinstalled with pnpm"
+fi
+
+# Remove packed dependencies (no longer needed)
+if [ -d ".packed-deps" ]; then
+  rm -rf .packed-deps
+  echo "✅ Removed .packed-deps/"
+fi
+
+echo "✨ Development environment restored!"
 
