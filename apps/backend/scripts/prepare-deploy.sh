@@ -4,7 +4,11 @@
 
 set -e
 
-echo "🔨 Building TypeScript..."
+echo "📦 Building workspace dependencies..."
+cd ../../packages/types && pnpm run build && cd -
+echo "✅ Built @everdesk/types"
+
+echo "🔨 Building backend..."
 pnpm run build
 
 echo "📦 Copying workspace dependencies..."

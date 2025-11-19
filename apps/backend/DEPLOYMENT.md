@@ -8,11 +8,32 @@ This Firebase Functions project is part of a pnpm monorepo and uses workspace de
 # Install dependencies (from monorepo root)
 pnpm install
 
-# Build TypeScript
+# Build the types package (first time setup)
+cd packages/types && pnpm run build && cd -
+
+# Build backend TypeScript
 pnpm run build
 
 # Run emulators
 pnpm run serve
+```
+
+### Development Workflow
+
+When making changes to shared packages (like `@everdesk/types`):
+
+1. Edit files in `/packages/types/src/`
+2. Build the types package: `cd ../../packages/types && pnpm run build`
+3. Backend will automatically pick up changes (via symlink)
+4. Rebuild backend: `pnpm run build`
+
+Or use watch mode for types:
+```bash
+# Terminal 1: Watch types package
+cd packages/types && pnpm run dev
+
+# Terminal 2: Work on backend
+cd apps/backend && pnpm run build:watch
 ```
 
 ## Deployment to Firebase
@@ -33,8 +54,10 @@ This script automatically:
 ### What Happens Behind the Scenes
 
 **During Deployment (`prepare:deploy`)**:
-- Converts symlinks to real directories (Firebase can't upload symlinks)
-- Copies `@everdesk/types` from `packages/types` → `node_modules/@everdesk/types`
+1. Builds workspace packages (`@everdesk/types`) to compile TypeScript → JavaScript
+2. Builds the backend functions
+3. Converts symlinks to real directories (Firebase can't upload symlinks)
+4. Copies compiled packages from `packages/types` → `node_modules/@everdesk/types`
 
 **After Deployment (`restore:symlinks`)**:
 - Removes hard copies of workspace packages
@@ -42,9 +65,14 @@ This script automatically:
 - **This is crucial**: ensures changes to `packages/types` are immediately reflected in your backend during development
 
 **Why this matters?** 
-- With symlinks (dev): Changes to `packages/types` are instantly available ✅
-- With hard copies (deploy): Firebase can upload the actual code ✅
+- With symlinks (dev): Changes to `packages/types` are instantly available after rebuild ✅
+- With hard copies (deploy): Firebase can upload the actual compiled code ✅
 - Auto-restore: You get the best of both worlds! 🎉
+
+**Module System**:
+- `@everdesk/types` compiles to CommonJS (using `NodeNext`)
+- Backend uses CommonJS (Firebase Functions standard)
+- No experimental warnings or compatibility issues ✅
 
 ## Adding More Workspace Dependencies
 
