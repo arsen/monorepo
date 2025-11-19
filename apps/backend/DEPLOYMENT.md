@@ -124,7 +124,7 @@ This script automatically:
 
 1. **First time**: `prepare:deploy` generates `package-lock.json` → **commit this to git**
 2. **Subsequent times**: `prepare:deploy` uses existing lockfile with `npm ci`
-3. **Updates**: Only regenerate when you add/update dependencies in `package.json`
+3. **After adding dependencies**: Run `sync-lockfile` to update the lockfile
 
 ```bash
 # After first prepare:deploy
@@ -132,18 +132,67 @@ git add package-lock.json
 git commit -m "Add package-lock.json for reproducible Firebase builds"
 ```
 
-### When to Regenerate
+### Critical: Sync After Adding Dependencies
 
-Regenerate `package-lock.json` when:
-- You update `firebase-admin`, `firebase-functions`, or other dependencies
-- You add new workspace packages
+⚠️ **IMPORTANT**: When you add/update dependencies with pnpm, you **MUST** sync the lockfile:
 
 ```bash
-# Force regeneration
-rm package-lock.json
-npm run prepare:deploy
-git add package-lock.json
-git commit -m "Update package-lock.json"
+# 1. Add a new dependency using pnpm (in development)
+pnpm add express
+# → This updates pnpm-lock.yaml ✅
+# → But NOT package-lock.json ❌
+
+# 2. Immediately sync package-lock.json
+npm run sync-lockfile
+# → Regenerates package-lock.json with current versions ✅
+
+# 3. Commit both lockfiles
+git add package.json package-lock.json ../../pnpm-lock.yaml
+git commit -m "Add express dependency"
+```
+
+**Why this matters:**
+- Without syncing: Dev has `express@4.18.0`, but deployment might install `4.19.0` weeks later
+- With syncing: Both dev and deployment use **exact same versions** ✅
+
+### Safety Check: Automatic Detection
+
+✅ **Don't worry if you forget!** The deploy script now has a built-in check:
+
+```bash
+# If you forget to sync and try to deploy:
+npm run deploy
+
+# Output:
+⚠️  WARNING: package.json is newer than package-lock.json!
+⚠️  You may have added dependencies without running sync-lockfile
+
+Run this to sync:
+  npm run sync-lockfile
+
+# Deployment is BLOCKED until you sync! 🛡️
+```
+
+You can also manually check anytime:
+```bash
+npm run check-lockfiles
+```
+
+### The Workflow
+
+```bash
+# Adding a Firebase dependency
+cd apps/backend
+pnpm add @google-cloud/storage
+npm run sync-lockfile
+git add package.json package-lock.json ../../pnpm-lock.yaml
+git commit -m "Add Google Cloud Storage"
+
+# Updating an existing dependency  
+pnpm add firebase-admin@latest
+npm run sync-lockfile
+git add package.json package-lock.json ../../pnpm-lock.yaml
+git commit -m "Update firebase-admin"
 ```
 
 ## Adding More Workspace Dependencies
@@ -204,6 +253,28 @@ npm run postdeploy
 ```
 
 This will restore the pnpm environment.
+
+### Production has different versions than development
+
+You added a dependency with pnpm but forgot to sync `package-lock.json`:
+```bash
+npm run sync-lockfile
+git add package-lock.json
+git commit -m "Sync package-lock.json"
+```
+
+### How do I know if lockfiles are out of sync?
+
+Check the dependency versions:
+```bash
+# Check what dev has (from pnpm-lock.yaml)
+pnpm list express
+
+# Check what will deploy (from package-lock.json)
+grep '"express":' package-lock.json -A2
+```
+
+If they differ, run `npm run sync-lockfile`.
 
 ### Manual Operations
 
