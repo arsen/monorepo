@@ -1,15 +1,8 @@
-# Deploy only the .deploy folder
-# Ignore everything at root level except .deploy
+# Ignore everything except package.json, lib, and .packed-deps
 /*
-!/.deploy/
 
-# Still ignore these even if they end up in .deploy somehow
-.git/
-.gitignore
-*.log
-firebase-debug*.log
-firebase-debug.*.log
-*.local
-.DS_Store
-node_modules
+# Only deploy these files/folders
+!/package.json
+!/lib/
+!/.packed-deps/
 

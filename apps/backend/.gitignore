@@ -75,8 +75,9 @@ node_modules/
 # Compiled output
 lib/
 
-# Deployment bundle folder (contains lib, node_modules, .packed-deps, etc.)
+# Deployment artifacts
 .deploy/
+.packed-deps/
 
 # Backup files
 *.backup

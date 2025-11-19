@@ -7,7 +7,7 @@
   },
   "functions": [
     {
-      "source": ".deploy",
+      "source": ".",
       "codebase": "default",
       "disallowLegacyRuntimeConfig": true
     }

@@ -34,7 +34,7 @@ export const hello = onRequest((request, response) => {
 
   // Example of using shared types
   const exampleData: Example = {
-    id: "123-updated",
+    id: "123-updated-v7",
     name: "Test",
     createdAt: new Date(),
   };

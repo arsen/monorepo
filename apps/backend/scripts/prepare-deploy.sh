@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to prepare Firebase Functions for deployment
-# Bundles everything into .deploy folder with packed workspace dependencies
+# Prepares current folder with packed workspace dependencies
 
 set -e
 
@@ -16,9 +16,9 @@ WORKSPACE_DEPS=(
 )
 # ============================================================================
 
-echo "🧹 Cleaning up old deployment bundle..."
-rm -rf .deploy
-echo "✅ Removed old .deploy folder"
+echo "🧹 Cleaning up old deployment artifacts..."
+rm -rf .packed-deps
+echo "✅ Removed old .packed-deps folder"
 
 echo "📦 Building workspace dependencies..."
 for dep in "${WORKSPACE_DEPS[@]}"; do
@@ -32,8 +32,8 @@ echo "✅ All workspace dependencies built"
 echo "🔨 Building backend..."
 npm run build
 
-echo "📁 Creating .deploy folder structure..."
-mkdir -p .deploy/.packed-deps
+echo "📁 Creating .packed-deps folder..."
+mkdir -p .packed-deps
 
 echo "📦 Packing workspace dependencies..."
 # Store the backend directory path for later use
@@ -43,18 +43,17 @@ for dep in "${WORKSPACE_DEPS[@]}"; do
   echo "   Packing $pkg_name..."
   cd "$pkg_path"
   TARBALL=$(npm pack --quiet)
-  mv "$TARBALL" "$BACKEND_DIR/.deploy/.packed-deps/"
+  mv "$TARBALL" "$BACKEND_DIR/.packed-deps/"
   cd - > /dev/null
-  echo "   ✅ Packed $pkg_name → .deploy/.packed-deps/$TARBALL"
+  echo "   ✅ Packed $pkg_name → .packed-deps/$TARBALL"
 done
 echo "✅ All workspace dependencies packed"
 
-echo "📋 Copying compiled code to .deploy..."
-cp -r lib .deploy/
-echo "✅ Copied lib/ to .deploy/lib/"
+echo "📝 Backing up original package.json..."
+cp package.json package.json.backup
 
-echo "📝 Creating deployment package.json with exact versions..."
-# Create modified package.json with exact versions from pnpm
+echo "📝 Updating package.json with exact versions..."
+# Update package.json with exact versions from pnpm
 node -e "
 const fs = require('fs');
 const { execSync } = require('child_process');
@@ -66,7 +65,7 @@ const pnpmList = execSync('pnpm list --json --depth=0', { encoding: 'utf8' });
 const installed = JSON.parse(pnpmList)[0];
 
 // Build a map of workspace package names to their tarball files
-const packedDir = '.deploy/.packed-deps';
+const packedDir = '.packed-deps';
 const files = fs.readdirSync(packedDir);
 const workspacePackageMap = {};
 
@@ -121,15 +120,19 @@ if (pkg.devDependencies) {
   });
 }
 
-fs.writeFileSync('.deploy/package.json', JSON.stringify(pkg, null, 2));
-console.log('✅ Created .deploy/package.json with exact versions');
+fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+console.log('✅ Updated package.json with exact versions');
 "
 
-# echo "🔧 Installing dependencies in .deploy folder..."
-# cd .deploy
+# echo "🔧 Installing dependencies..."
 # npm install --omit=dev --ignore-scripts
 # echo "✅ Installed production dependencies"
-# cd ..
 
 echo "✨ Deploy preparation complete!"
-echo "📦 Everything bundled in .deploy/ folder:"
+echo "📦 Ready to deploy with:"
+echo "   ✓ package.json (with exact versions)"
+echo "   ✓ lib/ (compiled code)"
+echo "   ✓ .packed-deps/ (workspace dependencies)"
+echo ""
+echo "💡 Run 'firebase deploy --only functions' to deploy"
+echo "💡 Run 'git restore package.json' after deployment to restore original package.json"
