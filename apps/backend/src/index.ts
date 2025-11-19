@@ -30,7 +30,6 @@ import { Example } from "@everdesk/types";
 setGlobalOptions({ maxInstances: 10 });
 
 export const hello = onRequest((request, response) => {
-  const aaa = '111';
   logger.info("Hello logs!", { structuredData: true });
 
   // Example of using shared types
