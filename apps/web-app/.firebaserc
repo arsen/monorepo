@@ -1,0 +1,22 @@
+{
+  "projects": {
+    "dev": "dev_project_id",
+    "prod": "prod_project_id"
+  },
+  "targets": {
+    "dev_project_id": {
+      "hosting": {
+        "client": [
+          "dev_project_id"
+        ]
+      }
+    },
+    "prod_project_id": {
+      "hosting": {
+        "client": [
+          "prod_project_id"
+        ]
+      }
+    }
+  }
+}

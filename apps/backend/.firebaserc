@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "yout project id goes here"
+    "dev": "everdesk-dev-3e0b5",
+    "prod": "everdesk-prod-ca065"
   }
 }
