@@ -1,0 +1,4 @@
+{
+  "extends": "@monorepo/typescript-config/vite-node.json",
+  "include": ["vite.config.ts"]
+}
