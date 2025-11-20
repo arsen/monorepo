@@ -1,6 +1,6 @@
-# @monorepo/types
+# @monorepo/utils
 
-Shared types and Zod schemas for the monorepo.
+Shared utility functions for the monorepo.
 
 ## Usage
 
@@ -9,43 +9,52 @@ Install the package in your app:
 ```json
 {
   "dependencies": {
-    "@monorepo/types": "workspace:*"
+    "@monorepo/utils": "workspace:*"
   }
 }
 ```
 
 ## Importing
 
-Import schemas and types in your apps:
+Import utility functions in your apps:
 
 ```typescript
-// Import Zod schemas
-import { exampleSchema } from "@monorepo/types/schemas";
+import { exampleCamelCase } from "@monorepo/utils";
 
-// Import TypeScript types
-import type { ExampleType, Status } from "@monorepo/types/types";
-
-// Or import everything
-import { exampleSchema, type ExampleType } from "@monorepo/types/index";
+const result = exampleCamelCase("hello world"); // "helloWorld"
 ```
 
-## Adding New Types
+## Available Utilities
 
-1. Create a new file in `src/` for Zod schemas/types
-2. Export them from the `index.ts` file
+### `exampleCamelCase(str: string): string`
 
-## Example
+Converts a string to camelCase using lodash.
 
 ```typescript
-// src/user.ts
-import { z } from "zod";
+import { exampleCamelCase } from "@monorepo/utils";
 
-export const User = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  name: z.string().optional(),
-});
-
-export type User = z.infer<typeof User>;
+exampleCamelCase("hello world"); // "helloWorld"
+exampleCamelCase("foo-bar-baz"); // "fooBarBaz"
 ```
 
+## Adding New Utilities
+
+1. Create or update files in `src/` with your utility functions
+2. Export them from the `src/index.ts` file
+3. Run `pnpm build` to compile TypeScript
+
+## Development
+
+```bash
+# Build the package
+pnpm build
+
+# Watch mode for development
+pnpm dev
+
+# Type check
+pnpm type-check
+
+# Lint
+pnpm lint
+```
