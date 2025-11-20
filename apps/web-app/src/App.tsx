@@ -2,6 +2,7 @@ import { Button } from '@monorepo/ui/components/button'
 import './App.css'
 import { useState } from 'react'
 import { Example } from '@monorepo/types'
+import { exampleCamelCase } from '@monorepo/utils'
 
 function App() {
   const [ count, setCount ] = useState(0)
@@ -25,6 +26,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <h3>
+        {exampleCamelCase("hello world")}
+      </h3>
     </div>
   )
 }
