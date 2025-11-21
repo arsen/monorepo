@@ -11,10 +11,10 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
-    "hooks": "@/hooks",
-    "lib": "@/lib",
-    "utils": "@monorepo/ui/lib/utils",
+    "components": "@/monorepo/ui/components",
+    "hooks": "@/monorepo/ui/hooks",
+    "lib": "@/monorepo/ui/lib",
+    "utils": "@/monorepo/ui/lib/utils",
     "ui": "@monorepo/ui/components"
   }
 }
