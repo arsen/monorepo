@@ -1,5 +1,4 @@
 import { Example } from "@monorepo/types";
-import { Button } from "@monorepo/ui/components/button";
 import { ThemeToggle } from "@monorepo/ui/theme/ThemeToggle";
 
 export default function Home() { 
@@ -11,8 +10,7 @@ export default function Home() {
   console.log(example);
   return (
     <div className="flex flex-col gap-4 min-h-screen items-center justify-center">
-      <h1>Hello World</h1>
-      <Button>Click me</Button>
+      <h1 className="text-2xl font-bold">SSR Web App</h1>
       <ThemeToggle />
     </div>
   );
