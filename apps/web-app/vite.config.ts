@@ -13,4 +13,7 @@ export default defineConfig({
       // "@monorepo/ui": path.resolve(__dirname, "../../packages/ui"),
     },
   },
+  server: {
+    port: 4000,
+  },
 })
