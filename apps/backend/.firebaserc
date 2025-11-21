@@ -1,6 +1,6 @@
 {
   "projects": {
-    "dev": "dev_project_id",
-    "prod": "prod_project_id"
+    "dev": "everdesk-dev-3e0b5",
+    "prod": "everdesk-prod-ca065"
   }
 }

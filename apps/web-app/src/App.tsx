@@ -1,4 +1,5 @@
 import { Button } from '@monorepo/ui/components/button'
+import { ThemeToggle } from '@monorepo/ui/theme/ThemeToggle'
 import './App.css'
 import { useState } from 'react'
 import { Example } from '@monorepo/types'
@@ -29,6 +30,7 @@ function App() {
       <h3>
         {exampleCamelCase("hello world")}
       </h3>
+      <ThemeToggle />
     </div>
   )
 }

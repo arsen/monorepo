@@ -2,8 +2,10 @@
   "extends": "@monorepo/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "paths": {
-      "@monorepo/ui/*": ["./src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["."],
