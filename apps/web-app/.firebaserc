@@ -7,14 +7,14 @@
     "dev_project_id": {
       "hosting": {
         "client": [
-          "dev_project_id"
+          "site_id"
         ]
       }
     },
     "prod_project_id": {
       "hosting": {
         "client": [
-          "prod_project_id"
+          "site_id"
         ]
       }
     }

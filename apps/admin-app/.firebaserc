@@ -7,14 +7,14 @@
     "dev_project_id": {
       "hosting": {
         "admin": [
-          "dev_project_id"
+          "site_id"
         ]
       }
     },
     "prod_project_id": {
       "hosting": {
         "admin": [
-          "prod_project_id"
+          "site_id"
         ]
       }
     }
